@@ -1,19 +1,16 @@
+const http = require('http')
 const express = require('express')
 const app = express()
 const port = 3000
 
-// Create an instance of the http server to handle HTTP requests
-let app = http.createServer((req, res) => {
-    // Set a response type of plain text for the response
-    res.writeHead(200, {'Content-Type': 'text/plain'});
+let terms = ['Rob', 'Michael']
+let visitCount = 0
 
-    // Send back a response and end the connection
-    res.end('Hello World!\n');
-});
+app.get('/', (req, res) => {
+    res.send('Hello, ' + terms[visitCount % 2])
+    visitCount++
+})
 
-// Start the server on port 3000
-app.listen(3000, '127.0.0.1');
+app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
 
 console.log('Node server running on port 3000');
-
-// Testing pull request #2

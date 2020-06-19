@@ -5,5 +5,5 @@ To get this running:
 2. git clone https://github.com/munch1324/grandes_hacking
 3. Install node.js - https://nodejs.org/en/download/
 4. Install MS Visual Studio Code - https://code.visualstudio.com/download
-5. node app.js
-6.
+5. npm install express
+6. node app.js
