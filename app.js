@@ -17,7 +17,26 @@ app.get('/StockNews/:tickerSymbol', (req, res) => {
         if (error) {
             console.error(error);
         } else {
-            const prettyVersion = data.map(dataMember => `<img width="25%" src="${dataMember.image}" /><a href="${dataMember.url}" >${dataMember.headline}</b><br/>`).join('');
+            const prettyVersion = data.map(
+                dataMember => `<img width="25%" src="${dataMember.image}" /><a href="${dataMember.url}" >${dataMember.headline}</b><br/>`
+                ).join('');
+            res.send(prettyVersion);
+        }
+    });
+    visitCount++
+})
+
+app.get('/StockNews/:tickerSymbol/start/:startdateyear/:startdatemonth/:startdateday/end/:enddateyear/:enddatemonth/:enddateday/', (req, res) => {
+    //Company News
+    startDate = [req.params["startdateyear"], req.params["startdatemonth"], req.params["startdateday"]].join('-');
+    endDate = [req.params["enddateyear"], req.params["enddatemonth"], req.params["enddateday"]].join('-');
+    finnhubClient.companyNews(req.params["tickerSymbol"], startDate, endDate, (error, data, response) => {
+        if (error) {
+            console.error(error);
+        } else {
+            const prettyVersion = data.map(
+                dataMember => `<img width="25%" src="${dataMember.image}" /><a href="${dataMember.url}" >${dataMember.headline}</b><br/>`
+                ).join('');
             res.send(prettyVersion);
         }
     });
