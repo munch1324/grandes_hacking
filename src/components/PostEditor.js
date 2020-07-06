@@ -43,18 +43,7 @@ const PostEditor = ({ classes, post, onSave, history }) => (
           <form onSubmit={handleSubmit}>
             <CardContent className={classes.modalCardContent}>
               <Field name="title">
-                {({ input }) => <TextField label="Title" autoFocus {...input} />}
-              </Field>
-              <Field name="body">
-                {({ input }) => (
-                  <TextField
-                    className={classes.marginTop}
-                    label="Body"
-                    multiline
-                    rows={4}
-                    {...input}
-                  />
-                )}
+                {({ input }) => <TextField label="Stock Symbol" autoFocus {...input} />}
               </Field>
             </CardContent>
             <CardActions>

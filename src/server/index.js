@@ -33,7 +33,15 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-app.use(async (req, res, next) => {
+var savedStocks = ['AAPL']
+
+app.put('/saveStock', (req, res) => {
+  console.log('new stock')
+  
+  console.log(req)
+})
+
+app.get('/posts', async (req, res, next) => {
   try {
     finnhubClient.companyNews("AAPL", "2020-01-01", "2020-05-01", (error, data, response) => {
       if (error) {
@@ -41,8 +49,7 @@ app.use(async (req, res, next) => {
       } else {
           // console.log(data);
           y = data.map(x => ({title : x.headline }));
-          res.send(y)
-          database.Post.bulkCreate(y)
+          res.send(y.slice(0, 10))
       }
     })
   } catch (error) {
@@ -50,27 +57,5 @@ app.use(async (req, res, next) => {
   }
 });
 
-const database = new Sequelize({
-  dialect: 'sqlite',
-  storage: './test.sqlite',
-});
-
-const Post = database.define('posts', {
-  title: Sequelize.STRING,
-  body: Sequelize.TEXT,
-});
-
-epilogue.initialize({ app, sequelize: database });
-
-epilogue.resource({
-  model: Post,
-  endpoints: ['/posts', '/posts/:id'],
-});
-
-const port = process.env.SERVER_PORT || 3001;
-
-database.sync().then(() => {
-  app.listen(port, () => {
-    console.log(`Listening on port ${port}`);
-  });
-});
+let port = 3001
+app.listen(port, () => console.log(`Example app listening at http://localhost:3001`))

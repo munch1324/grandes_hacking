@@ -72,21 +72,10 @@ class PostsManager extends Component {
   }
 
   savePost = async (post) => {
-    if (post.id) {
-      await this.fetch('put', `/posts/${post.id}`, post);
-    } else {
-      await this.fetch('post', '/posts', post);
-    }
+    await this.fetch('put', `/saveStock`, post);
 
     this.props.history.goBack();
     this.getPosts();
-  }
-
-  async deletePost(post) {
-    if (window.confirm(`Are you sure you want to delete "${post.title}"`)) {
-      await this.fetch('delete', `/posts/${post.id}`);
-      this.getPosts();
-    }
   }
 
   renderPostEditor = ({ match: { params: { id } } }) => {
@@ -108,17 +97,12 @@ class PostsManager extends Component {
           <Paper elevation={1} className={classes.posts}>
             <List>
               {orderBy(this.state.posts, ['updatedAt', 'title'], ['desc', 'asc']).map(post => (
-                <ListItem key={post.id} button component={Link} to={`/posts/${post.id}`}>
+                <ListItem key={post.id} button component={Link} to={`/posts/${post.id}`} divider='false' >
                   <ListItemText
                     primary={post.title}
                     secondary={post.updatedAt && `Updated ${moment(post.updatedAt).fromNow()}`}
                   />
-                  <ListItemSecondaryAction>
-                    <IconButton onClick={() => this.deletePost(post)} color="inherit">
-                      <DeleteIcon />
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>
+                  </ListItem>
               ))}
             </List>
           </Paper>

@@ -26,7 +26,6 @@ const App = ({ classes }) => (
     <main className={classes.main}>
       <Route exact path="/posts" component={Home} />
       <Route path="/posts" component={PostsManager} />
-      <Route path="/implicit/callback" component={ImplicitCallback} />
     </main>
   </Fragment>
 );
