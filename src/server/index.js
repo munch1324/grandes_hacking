@@ -11,24 +11,6 @@ const api_key = finnhub.ApiClient.instance.authentications['api_key'];
 api_key.apiKey = "brqma3frh5rce3ls8mk0" // Replace this
 const finnhubClient = new finnhub.DefaultApi()
 
-// let visitCount = 0
-
-// app.get('/StockNews/:tickerSymbol', (req, res) => {
-//     //Company News
-    // finnhubClient.companyNews(req.params["tickerSymbol"], "2020-01-01", "2020-05-01", (error, data, response) => {
-    //     if (error) {
-    //         console.error(error);
-    //     } else {
-    //         const prettyVersion = data.map(
-    //             dataMember => `<img width="25%" src="${dataMember.image}" /><a href="${dataMember.url}" >${dataMember.headline}</b><br/>`
-    //             ).join('');
-    //         res.send(prettyVersion);
-//         }
-//     });
-//     visitCount++
-// })
-
-
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
@@ -37,24 +19,34 @@ var savedStocks = ['AAPL']
 
 app.put('/saveStock', (req, res) => {
   console.log('new stock')
-  
-  console.log(req)
+  savedStocks.push(req.body.title)
+  res.send('')
+})
+
+app.get('/savedStocks', (req, res) => {
+  res.send(savedStocks)
 })
 
 app.get('/posts', async (req, res, next) => {
-  try {
-    finnhubClient.companyNews("AAPL", "2020-01-01", "2020-05-01", (error, data, response) => {
+
+  var combinedNews = []
+  savedStocks.forEach(stockSymbol => {
+    finnhubClient.companyNews(stockSymbol, "2020-01-01", "2020-05-01", (error, data, response) => {
       if (error) {
           console.error(error);
       } else {
-          // console.log(data);
-          y = data.map(x => ({title : x.headline }));
-          res.send(y.slice(0, 10))
+          y = data.map(x => ({title : x.headline, ticker: stockSymbol }));
+          var slimmed = y.slice(0,4);
+          combinedNews = combinedNews.concat(slimmed)
       }
     })
-  } catch (error) {
-    next(error.message);
-  }
+  })
+  
+  // TODO: use promises instead
+  setTimeout(function() {
+    res.send(combinedNews)
+  }, 2000);
+  
 });
 
 let port = 3001

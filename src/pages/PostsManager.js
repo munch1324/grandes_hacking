@@ -92,7 +92,7 @@ class PostsManager extends Component {
 
     return (
       <Fragment>
-        <Typography variant="h4">Posts Manager</Typography>
+        <Typography variant="h4">Stock News</Typography>
         {this.state.posts.length > 0 ? (
           <Paper elevation={1} className={classes.posts}>
             <List>
@@ -100,7 +100,7 @@ class PostsManager extends Component {
                 <ListItem key={post.id} button component={Link} to={`/posts/${post.id}`} divider='false' >
                   <ListItemText
                     primary={post.title}
-                    secondary={post.updatedAt && `Updated ${moment(post.updatedAt).fromNow()}`}
+                    secondary={post.ticker}
                   />
                   </ListItem>
               ))}
