@@ -12,7 +12,9 @@ import {
   ListItemSecondaryAction,
 } from '@material-ui/core';
 import Fab from '@material-ui/core/Fab';
-import { Delete as DeleteIcon, Add as AddIcon } from '@material-ui/icons';
+import MySpeedDial from '../components/SpeedDial';
+
+import { Delete as DeleteIcon, Add as AddIcon, Edit as EditIcon } from '@material-ui/icons';
 import moment from 'moment';
 import { find, orderBy } from 'lodash';
 import { compose } from 'recompose';
@@ -109,15 +111,13 @@ class PostsManager extends Component {
         ) : (
           !this.state.loading && <Typography variant="subtitle1">No posts to display</Typography>
         )}
-        <Fab
-          color="secondary"
-          aria-label="add"
-          className={classes.fab}
-          component={Link}
-          to="/posts/new"
-        >
-          <AddIcon />
-        </Fab>
+        
+        <MySpeedDial actions = {[
+          { icon: <AddIcon />, name: 'Add' , linkName: "/posts/new"},
+          { icon: <EditIcon />, name: 'Edit' , linkName: "/posts/new"},
+          { icon: <DeleteIcon />, name: 'Delete' , linkName: "/posts/new"},
+        ]}/>
+
         <Route exact path="/posts/:id" render={this.renderPostEditor} />
         {this.state.error && (
           <ErrorSnackbar
