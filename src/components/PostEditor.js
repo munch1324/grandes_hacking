@@ -42,7 +42,7 @@ const PostEditor = ({ classes, post, onSave, history }) => (
         <Card className={classes.modalCard}>
           <form onSubmit={handleSubmit}>
             <CardContent className={classes.modalCardContent}>
-              <Field name="title">
+              <Field name="tickerSymbol">
                 {({ input }) => <TextField label="Stock Symbol" autoFocus {...input} />}
               </Field>
             </CardContent>

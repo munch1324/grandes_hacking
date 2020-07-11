@@ -61,7 +61,9 @@ class PostsManager extends Component {
           authorization: `Bearer ${await this.props.auth.getAccessToken()}`,
         },
       });
-      return await response.json();
+      return await response.text().then(function(text) {
+        return text ? JSON.parse(text) : {}
+      });
     } catch (error) {
       console.error(error);
 
@@ -80,13 +82,26 @@ class PostsManager extends Component {
     this.getPosts();
   }
 
+  deletePost = async (post) => {
+    await this.fetch('delete', `/removeStock`, post);
+
+    this.props.history.goBack();
+    this.getPosts();
+  }
+
   renderPostEditor = ({ match: { params: { id } } }) => {
     if (this.state.loading) return null;
     const post = find(this.state.posts, { id: Number(id) });
 
-    if (!post && id !== 'new') return <Redirect to="/posts" />;
+    if (!post) {
+      if (id == 'new') {
+        return <PostEditor post={post} onSave={this.savePost} />;
+      } else if (id == 'delete'){
+        return <PostEditor post={post} onSave={this.deletePost} />;
+      }
+    }
+    return <Redirect to="/posts" />;
 
-    return <PostEditor post={post} onSave={this.savePost} />;
   };
 
   render() {
@@ -115,7 +130,7 @@ class PostsManager extends Component {
         <MySpeedDial actions = {[
           { icon: <AddIcon />, name: 'Add' , linkName: "/posts/new"},
           { icon: <EditIcon />, name: 'Edit' , linkName: "/posts/new"},
-          { icon: <DeleteIcon />, name: 'Delete' , linkName: "/posts/new"},
+          { icon: <DeleteIcon />, name: 'Delete' , linkName: "/posts/delete"},
         ]}/>
 
         <Route exact path="/posts/:id" render={this.renderPostEditor} />
