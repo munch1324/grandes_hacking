@@ -11,11 +11,8 @@ const api_key = finnhub.ApiClient.instance.authentications['api_key'];
 api_key.apiKey = "brqma3frh5rce3ls8mk0" // Replace this
 const finnhubClient = new finnhub.DefaultApi();
 
-// mongo db
-const mongo = require('mongodb').MongoClient
-const db_url = 'mongodb://localhost:27017';
-
-
+// Local imports
+const grandeDB = require('./database.js');
 
 const app = express();
 app.use(cors());
@@ -24,58 +21,13 @@ app.use(bodyParser.json());
 app.put('/saveStock', (req, res) => {
   console.log('new stock')
   
-  mongo.connect(db_url, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  }, (err, client) => {
-    if (err) {
-      console.error(err)
-      return
-    }
-    db = client.db('GrandeHackingDB');
-    collection = db.collection('stockTickers');
-    // check if the ticker already exists
-    collection.findOne({tickerSymbol: req.body.tickerSymbol}, (err, item) => {
-      if (err) {
-        console.error(err)
-      }
-      if (item) {
-        console.log("Ticker already found. No ticker added");
-      } else {
-        collection.insertOne({tickerSymbol: req.body.tickerSymbol}, (err, result) => {
-          if (err) {
-              console.error(err);
-          } else {
-              console.log(result)
-          }
-        });
-      }
-    });
-  });
+  grandeDB.addStockTicker(req.body.tickerSymbol)
   res.send('')
 })
 
 app.delete('/removeStock', (req, res) => {
   console.log('remove stock')
-  
-  mongo.connect(db_url, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  }, (err, client) => {
-    if (err) {
-      console.error(err)
-      return
-    }
-    db = client.db('GrandeHackingDB');
-    collection = db.collection('stockTickers');
-    
-    collection.deleteMany({tickerSymbol: req.body.tickerSymbol}, (err, item) => {
-      if (err) {
-        console.error(err)
-      }
-      console.log("Deletion successful.")
-    });
-  });
+  grandeDB.removeStockTicker(req.body.tickerSymbol)
   res.send('')
 })
 
@@ -85,40 +37,27 @@ app.get('/savedStocks', (req, res) => {
 
 app.get('/posts', async (req, res, next) => {
 
-  var combinedNews = []
-  mongo.connect(db_url, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  }, (err, client) => {
-    if (err) {
-      console.error(err)
-      return
-    }
-    db = client.db('GrandeHackingDB');
-    collection = db.collection('stockTickers');
-    // check if the ticker already exists
-    collection.find({}).toArray((err, items) => {
-      if (err) {
-        console.error(err)
-        return
+  var combinedNews = await grandeDB.savedStockTickers()
+  var promises = []
+  combinedNews.forEach(item => {
+    var networkPromise = new Promise(resolve => 
+    finnhubClient.companyNews(item.tickerSymbol, "2020-01-01", "2020-05-01", (error, data, response) => {
+      if (error) {
+          console.error(error);
+      } else {
+          y = data.map(x => ({title : x.headline, ticker: item.tickerSymbol, url: x.url }));
+          var slimmed = y.slice(0,2);
+          combinedNews = combinedNews.concat(slimmed)
       }
-      items.forEach(item => {
-        finnhubClient.companyNews(item.tickerSymbol, "2020-01-01", "2020-05-01", (error, data, response) => {
-          if (error) {
-              console.error(error);
-          } else {
-              y = data.map(x => ({title : x.headline, ticker: item.tickerSymbol, url: x.url }));
-              var slimmed = y.slice(0,2);
-              combinedNews = combinedNews.concat(slimmed)
-          }
-        })
-      })
-    });
+      resolve()
+    })
+    )
+    promises.push(networkPromise)
   });
-  // TODO: use promises instead
-  setTimeout(function() {
+  
+  Promise.all(promises).then((values) => {
     res.send(combinedNews)
-  }, 2000);
+  })
   
 });
 
