@@ -16,7 +16,7 @@
     "final-form": "^4.8.3",
     "finnhub": "^1.1.7",
     "lodash": "^4.17.20",
-    "moment": "^2.22.2",
+    "moment": "^2.29.2",
     "mongodb": "^3.5.9",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
